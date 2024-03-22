@@ -33,7 +33,7 @@ class CurrencyLayerService
             ->mapWithKeys(fn (float $value, string $key) => [str_replace($source, '', $key) => $value])
             ->when(!empty($currencies), function (Collection $collection) use ($currencies) {
                 return $collection->filter(fn (float $value, string $key) => in_array($key, $currencies));
-            });
+            })->toArray();
     }
 
     /**
@@ -77,7 +77,7 @@ class CurrencyLayerService
         return $results->toArray();
     }
 
-    public function getSupportedCurrencies()
+    public function getSupportedCurrencies(): array
     {
         return Cache::remember('supported_currencies', 3600, function () {
             return $this->client->fetchSupportedCurrencies();
@@ -102,8 +102,8 @@ class CurrencyLayerService
             foreach ($rates as $currencyPair => $rate) {
                 $responseCurrency = substr($currencyPair, -3);
 
-                CurrencyRate::query()->updateOrCreate([
-                    'date' => $date,
+                CurrencyRate::query()->firstOrCreate([
+                    'date' => Carbon::parse($date),
                     'source_currency' => substr($currencyPair, 0, 3),
                     'currency' => $responseCurrency,
                 ], [

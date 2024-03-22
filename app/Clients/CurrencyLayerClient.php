@@ -44,7 +44,7 @@ class CurrencyLayerClient
         $response = Http::get($this->baseUrl . $endpoint, $query);
         $response->throwIf($response->failed());
 
-        return $response->json();
+        return $response->json()['quotes'];
     }
 
     /**
@@ -57,6 +57,7 @@ class CurrencyLayerClient
             'access_key' => $this->apiKey,
             'start_date' => $startDate->toDateString(),
             'end_date' => $endDate->toDateString(),
+            'source' => $source,
         ];
 
         if (!empty($currencies)) {

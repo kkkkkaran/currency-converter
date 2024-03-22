@@ -29,7 +29,7 @@ class CurrencyLayerClient
     /**
      * @throws RequestException
      */
-    public function fetchLiveRates(string $source = 'USD', array $currencies = []): array
+    public function fetchLiveRates(array $currencies = [], string $source = 'USD'): array
     {
         $endpoint = 'live';
         $query = [
@@ -50,7 +50,7 @@ class CurrencyLayerClient
     /**
      * @throws RequestException
      */
-    public function fetchHistoricalRatesForTimeFrame(Carbon $startDate, Carbon $endDate, array $currencies = []): array
+    public function fetchHistoricalRatesForTimeFrame(Carbon $startDate, Carbon $endDate, array $currencies = [], string $source = 'USD'): array
     {
         $endpoint = 'timeframe';
         $query = [
@@ -67,7 +67,7 @@ class CurrencyLayerClient
 
         $response->throwIf($response->failed());
 
-        return $response->json();
+        return $response->json()['quotes'];
     }
 
     /**

@@ -69,7 +69,9 @@ class CurrencyLayerService
         $apiResults = $this->fetchAndStoreHistoricalRates($startDate, $endDate, $currency, $sourceCurrency);
 
         foreach ($missingDates as $date => $rate) {
-            $results->put($date, $apiResults[$date] ?? null);
+            if (array_key_exists($date, $apiResults)){
+                $results->put($date, $apiResults[$date]);
+            }
         }
 
         return $results->toArray();

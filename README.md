@@ -1,66 +1,140 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Laravel Currency Converter API
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+The Currency Converter API is a Laravel-based application that provides users with the capability to obtain real-time currency conversion rates against the USD and to generate reports for historical conversion rates. It utilizes the CurrencyLayer API to fetch up-to-date currency information.
 
-## About Laravel
+## Features
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+- **User Authentication**: Implements Laravel Sanctum for secure API token authentication.
+- **Currency Conversion**: Offers real-time conversion rates for up to five selected currencies against the USD.
+- **Historical Reports**: Enables users to request historical conversion rates between USD and another currency, selectable by different ranges and intervals.
+- **Currency List**: Provides a comprehensive list of all available currencies supported by the CurrencyLayer API.
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+## Getting Started
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+### Prerequisites
 
-## Learning Laravel
+Before you begin, ensure you have the following installed:
+- PHP >= 8.2
+- Composer
+- A supported database by Laravel (MySQL, PostgreSQL, SQLite, etc.)
+- A CurrencyLayer API account and key
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+### Installation
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+Follow these steps to get your development environment running:
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+1. **Clone the repository**
 
-## Laravel Sponsors
+```bash
+git clone https://github.com/yourusername/currency-converter.git
+cd currency-converter
+```
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+### 2. Install Dependencies
 
-### Premium Partners
+Navigate to the project directory and install the PHP dependencies with Composer:
 
-- **[Vehikl](https://vehikl.com/)**
-- **[Tighten Co.](https://tighten.co)**
-- **[WebReinvent](https://webreinvent.com/)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel/)**
-- **[Cyber-Duck](https://cyber-duck.co.uk)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Jump24](https://jump24.co.uk)**
-- **[Redberry](https://redberry.international/laravel/)**
-- **[Active Logic](https://activelogic.com)**
-- **[byte5](https://byte5.de)**
-- **[OP.GG](https://op.gg)**
+```bash
+composer install
+```
 
-## Contributing
+### 3. Setup Environment
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+Duplicate the .env.example file to create a .env file which Laravel uses for environment-specific settings:
 
-## Code of Conduct
+```bash
+cp .env.example .env
+```
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+Edit the .env file to configure your application settings, particularly for the database and CurrencyLayer API:
 
-## Security Vulnerabilities
+```
+DB_CONNECTION=mysql
+DB_HOST=127.0.0.1
+DB_PORT=3306
+DB_DATABASE=your_database_name
+DB_USERNAME=your_database_username
+DB_PASSWORD=your_database_password
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+CURRENCYLAYER_API_KEY=your_currencylayer_api_key_here
+```
 
-## License
+### 4. Generate Application Key
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+Run the following Artisan command to generate a new application key. This is important for securing your application's session and encrypted data:
+
+```bash
+php artisan key:generate
+```
+
+### 5. Run Migrations
+
+Run the following Artisan command to generate a new application key. This is important for securing your application's session and encrypted data:
+
+```bash
+php artisan migrate
+```
+
+### 6. Serve the Application
+
+Start the Laravel development server:
+
+```bash
+php artisan serve
+```
+
+Your Currency Converter API should now be accessible at http://localhost:8000.
+
+## Usage
+
+After setting up the project, you can utilize the API endpoints as follows:
+
+### Authentication
+
+The API uses Laravel Sanctum for authentication. Register and log in to obtain an API token.
+
+- **Register**: Send a `POST` request to `/register` with `name`, `email`, and `password`.
+- **Login**: Send a `POST` request to `/login` with `email` and `password`. Store the returned `token` for subsequent requests.
+
+### API Endpoints
+
+**Note:** All protected endpoints require an `Authorization` header with the value `Bearer {your_token_here}`.
+
+- **List Available Currencies**:  
+  `GET /api/currencies`  
+  Lists all available currencies supported by the CurrencyLayer API.
+
+- **Convert Currencies**:  
+  `GET /api/currencies/convert?currencies[]=USD&currencies[]=EUR`  
+  Converts selected currencies against each other. Replace `USD` and `EUR` with your selected currencies. Accepts up to five currencies.
+
+- **Request Historical Conversion Rate Report**:  
+  `POST /api/currencies/report`  
+  Submits a request for a historical conversion rate report. Requires a JSON payload specifying `currency`, `start_date`, `end_date`, and `interval`.
+
+### Example Requests
+
+**Register User:**
+
+```bash
+curl -X POST /register \
+     -H "Content-Type: application/json" \
+     -d '{"name": "John Doe", "email": "john@example.com", "password": "password"}'
+```
+
+**Convert Currencies:**
+
+```bash
+curl -X GET /api/currencies/convert?currencies[]=USD&currencies[]=EUR \
+     -H "Authorization: Bearer {your_token_here}"
+
+```
+
+## Testing
+
+To run the PHPUnit tests included with the project, execute the following command:
+
+```bash
+./vendor/bin/phpunit
+```
+

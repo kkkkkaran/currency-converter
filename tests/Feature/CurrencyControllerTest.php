@@ -4,11 +4,14 @@ namespace Tests\Feature;
 
 use App\Models\User;
 use App\Services\CurrencyLayerService;
+use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Laravel\Sanctum\Sanctum;
 use Tests\TestCase;
 
 class CurrencyControllerTest extends TestCase
 {
+    use DatabaseTransactions;
+
     /** @test */
     public function it_lists_supported_currencies()
     {
@@ -25,6 +28,12 @@ class CurrencyControllerTest extends TestCase
                 'USD' => 'United States Dollar',
                 'EUR' => 'Euro',
             ]);
+    }
+
+    /** @test */
+    public function request_fails_for_unauthenticated_user()
+    {
+        $this->getJson('/api/currencies')->assertUnauthorized();
     }
 
     /** @test */
@@ -53,5 +62,65 @@ class CurrencyControllerTest extends TestCase
                 'currencies' => ['USD', 'EUR', 'GBP'],
                 'matrix' => $expectedMatrix,
             ]);
+    }
+
+    /** @test */
+    public function request_fails_without_currencies()
+    {
+        $this->mock(CurrencyLayerService::class)
+            ->expects('getSupportedCurrencies')
+            ->andReturn(['USD' => 'United States Dollar', 'EUR' => 'Euro', 'GBP' => 'Great British Pound']);
+
+        Sanctum::actingAs(User::factory()->create());
+
+        $response = $this->getJson('/api/currencies/convert');
+
+        $response->assertStatus(422)
+            ->assertJsonValidationErrors(['currencies']);
+    }
+
+    /** @test */
+    public function request_fails_with_less_than_minimum_currencies()
+    {
+        $this->mock(CurrencyLayerService::class)
+            ->expects('getSupportedCurrencies')
+            ->andReturn(['USD' => 'United States Dollar', 'EUR' => 'Euro', 'GBP' => 'Great British Pound']);
+
+        Sanctum::actingAs(User::factory()->create());
+
+        $response = $this->getJson('/api/currencies/convert?currencies[]=USD');
+
+        $response->assertStatus(422)
+            ->assertJsonValidationErrors(['currencies']);
+    }
+
+    /** @test */
+    public function request_fails_with_more_than_maximum_currencies()
+    {
+        $this->mock(CurrencyLayerService::class)
+            ->expects('getSupportedCurrencies')
+            ->andReturn(['USD' => 'United States Dollar', 'EUR' => 'Euro', 'GBP' => 'Great British Pound']);
+
+        Sanctum::actingAs(User::factory()->create());
+
+        $response = $this->getJson('/api/currencies/convert?currencies[]=USD&currencies[]=EUR&currencies[]=GBP&currencies[]=CAD&currencies[]=AUD&currencies[]=JPY');
+
+        $response->assertStatus(422)
+            ->assertJsonValidationErrors(['currencies']);
+    }
+
+    /** @test */
+    public function request_fails_with_unsupported_currencies()
+    {
+        $this->mock(CurrencyLayerService::class)
+            ->expects('getSupportedCurrencies')
+            ->andReturn(['USD' => 'United States Dollar', 'EUR' => 'Euro', 'GBP' => 'Great British Pound']);
+
+        Sanctum::actingAs(User::factory()->create());
+
+        $response = $this->getJson('/api/currencies/convert?currencies[]=USD&currencies[]=XYZ'); // XYZ is not supported
+
+        $response->assertStatus(422)
+            ->assertJsonValidationErrors(['currencies']);
     }
 }

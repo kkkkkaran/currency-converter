@@ -26,7 +26,7 @@ class CurrencyLayerService
     public function getLiveRates(array $currencies = [], string $source = 'USD'): ?array
     {
         $cachedResponse = Cache::remember("live_rates_{$source}", 120, function () use ($currencies, $source) {
-            return $this->client->fetchLiveRates($currencies, $source);
+            return $this->client->fetchLiveRates([], $source);
         });
 
         return collect($cachedResponse)

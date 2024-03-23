@@ -26,8 +26,9 @@ class CurrencyConversionRequest extends FormRequest
         $validator->after(function ($validator) {
             $currencyLayerService = resolve(CurrencyLayerService::class);
             $supportedCurrencies = $currencyLayerService->getSupportedCurrencies();
+            $currencies = $this->currencies ?? [];
 
-            foreach ($this->currencies as $currency) {
+            foreach ($currencies as $currency) {
                 if (!array_key_exists($currency, $supportedCurrencies)) {
                     $validator->errors()->add('currencies', $currency . ' is not a supported currency.');
                 }

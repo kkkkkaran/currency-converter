@@ -48,6 +48,7 @@ cp .env.example .env
 
 Edit the .env file to configure your application settings, particularly for the database and CurrencyLayer API:
 
+For MySQL:
 ```
 DB_CONNECTION=mysql
 DB_HOST=127.0.0.1
@@ -59,6 +60,18 @@ DB_PASSWORD=your_database_password
 CURRENCYLAYER_API_KEY=your_currencylayer_api_key_here
 ```
 
+For SQLite: 
+
+```
+DB_CONNECTION=sqlite
+DB_DATABASE=/path/to/database/database.sqlite
+```
+
+If you don't already have a SQLite database file, create one with the following command:
+
+```
+touch /path/to/database/database.sqlite
+```
 ### 4. Generate Application Key
 
 Run the following Artisan command to generate a new application key. This is important for securing your application's session and encrypted data:
@@ -127,7 +140,6 @@ curl -X POST /register \
 ```bash
 curl -X GET /api/currencies/convert?currencies[]=USD&currencies[]=EUR \
      -H "Authorization: Bearer {your_token_here}"
-
 ```
 
 ## Testing

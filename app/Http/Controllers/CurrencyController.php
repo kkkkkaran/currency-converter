@@ -15,9 +15,7 @@ class CurrencyController extends Controller
 
     public function convert(CurrencyConversionRequest $request, CurrencyLayerService $currencyLayerService): JsonResponse
     {
-        $validated = $request->validated();
-
-        $selectedCurrencies = $validated['currencies'];
+        $selectedCurrencies = $request->validated()['currencies'];
         $rates = $currencyLayerService->getLiveRates($selectedCurrencies);
 
         $matrix = [];

@@ -29,15 +29,15 @@ class CurrencyReportRequest extends FormRequest
         $supportedCurrencies = array_keys(resolve(CurrencyLayerService::class)->getSupportedCurrencies());
 
         $basicRules =  [
-            'currency' => 'required|string', Rule::in($supportedCurrencies),
-            'start_date' => 'required|date',
-            'end_date' => 'required|date',
-            'interval' => 'required', Rule::enum(IntervalEnum::class),
+            'currency' => ['required', 'string', Rule::in($supportedCurrencies)],
+            'start_date' => ['required', 'date'],
+            'end_date' => ['required', 'date'],
+            'interval' => ['required', 'string', Rule::in(IntervalEnum::cases())],
         ];
 
         if ($this->has('start_date') && $startDate = Carbon::parse($this->start_date)) {
             $oneYearLater = $startDate->copy()->addYear()->format('Y-m-d');
-            $basicRules['end_date'] = 'before_or_equal:'.$oneYearLater;
+            $basicRules['end_date'] = ['after:'.$startDate, 'before_or_equal:'.$oneYearLater];
         }
 
         return $basicRules;

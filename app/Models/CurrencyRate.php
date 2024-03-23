@@ -11,7 +11,10 @@ class CurrencyRate extends Model
 
     protected $fillable = ['date', 'source_currency', 'currency', 'rate'];
 
-    protected $casts = [
-        'date' => 'date',
-    ];
+    protected function casts(): array
+    {
+        return [
+            'date' => 'immutable_date',
+        ];
+    }
 }

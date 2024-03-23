@@ -88,6 +88,14 @@ Run the following Artisan command to generate a new application key. This is imp
 php artisan migrate
 ```
 
+### 5. Link public storage
+
+Run the following Artisan command to create a symlink from `public/storage` to `storage/app/public`
+
+```bash
+php artisan storage:link
+```
+
 ### 6. Serve the Application
 
 Start the Laravel development server:
@@ -122,8 +130,12 @@ The API uses Laravel Sanctum for authentication. Register and log in to obtain a
   Converts selected currencies against each other. Replace `USD` and `EUR` with your selected currencies. Accepts up to five currencies.
 
 - **Request Historical Conversion Rate Report**:  
-  `POST /api/currencies/report`  
+  `POST /api/currencies/reports`  
   Submits a request for a historical conversion rate report. Requires a JSON payload specifying `currency`, `start_date`, `end_date`, and `interval`.
+
+- **View Requested Historical Conversion Rate Reports**:  
+  `GET /api/currencies/reports`  
+  Fetches status and link to report (If processed)
 
 ### Example Requests
 

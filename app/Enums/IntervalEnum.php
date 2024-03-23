@@ -2,11 +2,9 @@
 
 namespace App\Enums;
 
-use Illuminate\Support\Carbon;
-
-enum IntervalEnum
+enum IntervalEnum: string
 {
-    case Daily;
-    case Weekly;
-    case Monthly;
+    case Daily = 'daily';
+    case Weekly = 'weekly';
+    case Monthly = 'monthly';
 }

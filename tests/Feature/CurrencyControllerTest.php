@@ -121,6 +121,6 @@ class CurrencyControllerTest extends TestCase
         $response = $this->getJson('/api/currencies/convert?currencies[]=USD&currencies[]=XYZ'); // XYZ is not supported
 
         $response->assertStatus(422)
-            ->assertJsonValidationErrors(['currencies']);
+            ->assertJsonValidationErrors(['currencies.1']);
     }
 }

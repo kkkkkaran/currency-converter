@@ -2,7 +2,7 @@
 
 namespace App\Clients;
 
-use Carbon\Carbon;
+use Carbon\CarbonImmutable;
 use Illuminate\Http\Client\RequestException;
 use Illuminate\Support\Facades\Http;
 use InvalidArgumentException;
@@ -50,7 +50,12 @@ class CurrencyLayerClient
     /**
      * @throws RequestException
      */
-    public function fetchHistoricalRatesForTimeFrame(Carbon $startDate, Carbon $endDate, array $currencies = [], string $source = 'USD'): array
+    public function fetchHistoricalRatesForTimeFrame(
+        CarbonImmutable $startDate,
+        CarbonImmutable $endDate,
+        array $currencies = [],
+        string $source = 'USD'
+    ): array
     {
         $endpoint = 'timeframe';
         $query = [

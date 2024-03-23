@@ -66,8 +66,8 @@ class CurrencyLayerClientTest extends TestCase
         ]);
 
         $client = new CurrencyLayerClient();
-        $startDate = Carbon::createFromDate(2023, 3, 1);
-        $endDate = Carbon::createFromDate(2023, 3, 2);
+        $startDate = Carbon::createFromDate(2023, 3, 1)->toImmutable();
+        $endDate = Carbon::createFromDate(2023, 3, 2)->toImmutable();
 
         $response = $client->fetchHistoricalRatesForTimeFrame($startDate, $endDate, ['GBP', 'EUR']);
 
@@ -81,8 +81,8 @@ class CurrencyLayerClientTest extends TestCase
         Http::fake(['*/timeframe*' => Http::response([], 404)]);
 
         $client = new CurrencyLayerClient();
-        $startDate = Carbon::now()->subMonth();
-        $endDate = Carbon::now();
+        $startDate = Carbon::now()->subMonth()->toImmutable();
+        $endDate = Carbon::now()->toImmutable();
 
         $this->expectException(RequestException::class);
 

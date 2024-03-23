@@ -5,8 +5,9 @@ namespace App\Services;
 use App\Clients\CurrencyLayerClient;
 use App\Enums\IntervalEnum;
 use App\Models\CurrencyRate;
+use Carbon\Carbon;
+use Carbon\CarbonImmutable;
 use Illuminate\Http\Client\RequestException;
-use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Cache;
 use Throwable;
@@ -40,8 +41,8 @@ class CurrencyLayerService
      * @throws RequestException
      */
     public function getHistoricalRateForTimeFrame(
-        Carbon $startDate,
-        Carbon $endDate,
+        CarbonImmutable $startDate,
+        CarbonImmutable $endDate,
         string $currency,
         IntervalEnum $interval = IntervalEnum::Daily,
         string $sourceCurrency = 'USD'
@@ -50,13 +51,12 @@ class CurrencyLayerService
         $results = collect();
 
         $availableRates = CurrencyRate::query()
-            ->where('date', '>=', $startDate)
-            ->where('date', '<=', $endDate)
+            ->whereBetween('date', [$startDate, $endDate])
             ->where('source_currency', $sourceCurrency)
             ->where('currency', $currency)
             ->get();
 
-        for ($date = $startDate->copy(); $date->lte($endDate); $this->incrementDateForInterval($date, $interval)) {
+        for ($date = $startDate; $date->lte($endDate); $date = $this->incrementDateForInterval($date, $interval)) {
             $results->put($date->toDateString(), $availableRates->firstWhere('date', $date)?->rate);
         }
 
@@ -88,8 +88,8 @@ class CurrencyLayerService
      * @throws RequestException
      */
     private function fetchAndStoreHistoricalRates(
-        Carbon $startDate,
-        Carbon $endDate,
+        CarbonImmutable $startDate,
+        CarbonImmutable $endDate,
         string $currency,
         string $sourceCurrency = 'USD'
     ): array
@@ -119,7 +119,7 @@ class CurrencyLayerService
         return $results;
     }
 
-    private function incrementDateForInterval(Carbon $date, IntervalEnum $interval): Carbon
+    private function incrementDateForInterval(CarbonImmutable $date, IntervalEnum $interval): CarbonImmutable
     {
         if ($interval === IntervalEnum::Daily) {
             return $date->addDay();

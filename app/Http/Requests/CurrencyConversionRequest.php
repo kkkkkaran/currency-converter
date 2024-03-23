@@ -4,7 +4,7 @@ namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 use App\Services\CurrencyLayerService;
-use Illuminate\Validation\Validator;
+use Illuminate\Validation\Rule;
 
 class CurrencyConversionRequest extends FormRequest
 {
@@ -15,24 +15,11 @@ class CurrencyConversionRequest extends FormRequest
 
     public function rules(): array
     {
+        $supportedCurrencies = array_keys(resolve(CurrencyLayerService::class)->getSupportedCurrencies());
+
         return [
             'currencies' => ['required', 'array', 'min:2', 'max:5'],
-            'currencies.*' => ['required', 'string'],
+            'currencies.*' => ['required', 'string', Rule::in($supportedCurrencies)],
         ];
-    }
-
-    public function withValidator(Validator $validator): void
-    {
-        $validator->after(function ($validator) {
-            $currencyLayerService = resolve(CurrencyLayerService::class);
-            $supportedCurrencies = $currencyLayerService->getSupportedCurrencies();
-            $currencies = $this->currencies ?? [];
-
-            foreach ($currencies as $currency) {
-                if (!array_key_exists($currency, $supportedCurrencies)) {
-                    $validator->errors()->add('currencies', $currency . ' is not a supported currency.');
-                }
-            }
-        });
     }
 }

@@ -106,7 +106,7 @@ class CurrencyLayerServiceTest extends TestCase
 
         $service = resolve(CurrencyLayerService::class);
 
-        $rates = $service->getHistoricalRateForTimeFrame($startDate, $endDate, $currency, IntervalEnum::Daily, $sourceCurrency);
+        $rates = $service->getHistoricalRateForTimeFrame($startDate->toImmutable(), $endDate->toImmutable(), $currency, IntervalEnum::Daily, $sourceCurrency);
 
         $this->assertNotEmpty($rates);
         $this->assertEquals(0.75, $rates['2021-01-01']);
@@ -149,7 +149,7 @@ class CurrencyLayerServiceTest extends TestCase
 
         $service = resolve(CurrencyLayerService::class);
 
-        $rates = $service->getHistoricalRateForTimeFrame($startDate, $endDate, $currency, IntervalEnum::Daily, $sourceCurrency);
+        $rates = $service->getHistoricalRateForTimeFrame($startDate->toImmutable(), $endDate->toImmutable(), $currency, IntervalEnum::Daily, $sourceCurrency);
 
         $expectedRates = [
             "2021-01-01" => 0.75,
@@ -157,9 +157,7 @@ class CurrencyLayerServiceTest extends TestCase
             "2021-01-03" => 0.7381, // From API
         ];
 
-        foreach ($expectedRates as $date => $expectedRate) {
-            $this->assertEquals($expectedRate, $rates[$date]);
-        }
+        $this->assertEquals($expectedRates, $rates);
 
         $this->assertDatabaseHas(CurrencyRate::class, [
             'date' => '2021-01-01 00:00:00',

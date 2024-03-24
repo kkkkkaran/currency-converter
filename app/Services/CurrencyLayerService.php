@@ -32,6 +32,7 @@ class CurrencyLayerService
 
         return collect($cachedResponse)
             ->mapWithKeys(fn (float $value, string $key) => [str_replace($source, '', $key) => $value])
+            ->put($source, 1)
             ->when(!empty($currencies), function (Collection $collection) use ($currencies) {
                 return $collection->filter(fn (float $value, string $key) => in_array($key, $currencies));
             })->toArray();

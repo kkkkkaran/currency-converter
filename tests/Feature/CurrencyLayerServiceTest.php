@@ -27,9 +27,9 @@ class CurrencyLayerServiceTest extends TestCase
             ]);
 
         $service = resolve(CurrencyLayerService::class);
-        $rates = $service->getLiveRates(['GBP', 'EUR']);
+        $rates = $service->getLiveRates(['USD', 'GBP', 'EUR']);
 
-        $this->assertEquals(['GBP' => 0.75, 'EUR' => 0.85], $rates);
+        $this->assertEquals(['USD' => 1, 'GBP' => 0.75, 'EUR' => 0.85], $rates);
     }
 
     /** @test */

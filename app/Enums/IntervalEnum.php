@@ -4,7 +4,7 @@ namespace App\Enums;
 
 enum IntervalEnum: string
 {
-    case Daily = 'daily';
-    case Weekly = 'weekly';
-    case Monthly = 'monthly';
+    case Daily = 'Daily';
+    case Weekly = 'Weekly';
+    case Monthly = 'Monthly';
 }

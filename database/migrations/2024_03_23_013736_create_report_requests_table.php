@@ -18,7 +18,7 @@ return new class extends Migration
             $table->date('start_date');
             $table->date('end_date');
             $table->string('interval');
-            $table->string('status')->default('pending')->index();
+            $table->string('status')->default('Pending')->index();
             $table->foreignIdFor(User::class)->constrained();
 
             $table->timestamps();

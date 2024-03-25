@@ -12,8 +12,8 @@ class ReportRequestResource extends JsonResource
     public function toArray($request): array
     {
         return [
-            'start_date' => $this->start_date,
-            'end_date' => $this->end_date,
+            'start_date' => $this->start_date->format('Y-m-d'),
+            'end_date' => $this->end_date->format('Y-m-d'),
             'currency' => $this->currency,
             'interval' => $this->interval,
             'status' => $this->status,

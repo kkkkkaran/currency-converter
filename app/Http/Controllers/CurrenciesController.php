@@ -6,7 +6,7 @@ use App\Http\Requests\CurrencyConversionRequest;
 use App\Services\CurrencyLayerService;
 use Illuminate\Http\JsonResponse;
 
-class CurrencyController extends Controller
+class CurrenciesController extends Controller
 {
     public function list(CurrencyLayerService $currencyLayerService): JsonResponse
     {
@@ -15,7 +15,7 @@ class CurrencyController extends Controller
 
     public function convert(CurrencyConversionRequest $request, CurrencyLayerService $currencyLayerService): JsonResponse
     {
-        $selectedCurrencies = $request->validated()['currencies'];
+        $selectedCurrencies = $request->input('currencies');
         $rates = $currencyLayerService->getLiveRates($selectedCurrencies);
 
         $matrix = [];

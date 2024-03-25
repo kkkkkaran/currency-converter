@@ -39,18 +39,17 @@ class CurrencyReportControllerTest extends TestCase
             'start_date' => '2021-01-01',
             'end_date' => '2021-01-31',
             'currency' => 'USD',
-            'interval' => 'daily',
+            'interval' => 'Daily',
         ];
 
         $response = $this->postJson('/api/currencies/reports', $reportRequestData);
-
         $response->assertStatus(201);
 
         $this->assertDatabaseHas(ReportRequest::class, [
             "start_date" => "2021-01-01 00:00:00",
             "end_date" => "2021-01-31 00:00:00",
             "currency" => "USD",
-            "interval" => "daily",
+            "interval" => "Daily",
             "user_id" => $user->id,
         ]);
     }

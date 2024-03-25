@@ -31,7 +31,7 @@ class CurrencyReportRequest extends FormRequest
         $basicRules =  [
             'currency' => ['required', 'string', Rule::in($supportedCurrencies)],
             'start_date' => ['required', 'date'],
-            'end_date' => ['required', 'date'],
+            'end_date' => ['required', 'date', 'before_or_equal:today'],
             'interval' => ['required', 'string', Rule::in(IntervalEnum::cases())],
         ];
 

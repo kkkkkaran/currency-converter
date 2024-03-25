@@ -50,6 +50,8 @@ class ProcessReportsRequestsJob implements ShouldQueue
     {
         $stream = fopen('php://temp', 'w+b');
 
+        fputcsv($stream, ['date', 'rate']);
+
         foreach ($data as $date => $rate) {
             fputcsv($stream, [$date, $rate]);
         }

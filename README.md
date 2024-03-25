@@ -64,13 +64,12 @@ For SQLite:
 
 ```
 DB_CONNECTION=sqlite
-DB_DATABASE=/path/to/database/database.sqlite
 ```
 
 If you don't already have a SQLite database file, create one with the following command:
 
 ```
-touch /path/to/database/database.sqlite
+touch database/database.sqlite
 ```
 ### 4. Generate Application Key
 

@@ -9,40 +9,45 @@ use App\Services\CurrencyLayerService;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Cache;
-use Mockery;
 use Tests\TestCase;
 
 class CurrencyLayerServiceTest extends TestCase
 {
     use DatabaseTransactions;
 
-    /** @test */
-    public function it_fetches_live_rates_successfully()
+    public function setUp(): void
     {
+        parent::setUp();
+
+        Cache::flush();
+    }
+
+    /** @test */
+    public function it_fetches_and_caches_live_rates_successfully()
+    {
+        $fakeApiResponse = [
+            'USDGBP' => 0.75,
+            'USDEUR' => 0.85,
+        ];
+
         $this->mock(CurrencyLayerClient::class)
             ->expects('fetchLiveRates')
-            ->andReturn([
-                'USDGBP' => 0.75,
-                'USDEUR' => 0.85,
-            ]);
+            ->andReturn($fakeApiResponse);
 
         $service = resolve(CurrencyLayerService::class);
         $rates = $service->getLiveRates(['USD', 'GBP', 'EUR']);
 
         $this->assertEquals(['USD' => 1, 'GBP' => 0.75, 'EUR' => 0.85], $rates);
+        $this->assertEquals(Cache::get("live_rates_USD"), $fakeApiResponse);
     }
 
     /** @test */
-    public function it_caches_live_rates_correctly()
+    public function it_fetches_live_rates_from_cache()
     {
         $this->mock(CurrencyLayerClient::class)
             ->shouldNotHaveBeenCalled();
 
-        Cache::expects('remember')
-            ->with("live_rates_USD", 120, Mockery::on(function ($closure) {
-                return is_callable($closure);
-            }))
-            ->andReturn(['GBP' => 0.75, 'EUR' => 0.85]);
+        Cache::put("live_rates_USD", ['GBP' => 0.75, 'EUR' => 0.85]);
 
         $service = resolve(CurrencyLayerService::class);
         $rates = $service->getLiveRates(['GBP', 'EUR']);
@@ -57,14 +62,6 @@ class CurrencyLayerServiceTest extends TestCase
             ->expects('fetchSupportedCurrencies')
             ->andReturn(['USD' => 'United States Dollar', 'GBP' => 'British Pound Sterling']);
 
-        Cache::expects('remember')
-            ->with('supported_currencies', 3600, Mockery::on(function ($closure) {
-                return is_callable($closure);
-            }))
-            ->andReturnUsing(function ($key, $ttl, $callback) {
-                return $callback();
-            });
-
         $service = resolve(CurrencyLayerService::class);
         $currencies = $service->getSupportedCurrencies();
 
@@ -76,9 +73,7 @@ class CurrencyLayerServiceTest extends TestCase
     {
         $this->mock(CurrencyLayerClient::class)->shouldNotHaveBeenCalled();
 
-        Cache::expects('remember')
-            ->with('supported_currencies', 3600, Mockery::any())
-            ->andReturn(['USD' => 'United States Dollar', 'GBP' => 'British Pound Sterling']);
+        Cache::put('supported_currencies', ['USD' => 'United States Dollar', 'GBP' => 'British Pound Sterling']);
 
         $service = resolve(CurrencyLayerService::class);
 

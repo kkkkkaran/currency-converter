@@ -13,9 +13,9 @@ class CurrencyConversionRequest extends FormRequest
         return true;
     }
 
-    public function rules(): array
+    public function rules(CurrencyLayerService $currencyService): array
     {
-        $supportedCurrencies = array_keys(resolve(CurrencyLayerService::class)->getSupportedCurrencies());
+        $supportedCurrencies = array_keys($currencyService->getSupportedCurrencies());
 
         return [
             'currencies' => ['required', 'array', 'min:2', 'max:5'],

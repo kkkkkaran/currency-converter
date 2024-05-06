@@ -24,9 +24,9 @@ class CurrencyReportRequest extends FormRequest
      *
      * @return array<string, ValidationRule|array|string>
      */
-    public function rules(): array
+    public function rules(CurrencyLayerService $currencyService): array
     {
-        $supportedCurrencies = array_keys(resolve(CurrencyLayerService::class)->getSupportedCurrencies());
+        $supportedCurrencies = array_keys($currencyService->getSupportedCurrencies());
 
         $basicRules =  [
             'currency' => ['required', 'string', Rule::in($supportedCurrencies)],

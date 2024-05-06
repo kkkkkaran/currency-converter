@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Clients\CurrencyLayerClient;
 use App\Enums\IntervalEnum;
 use App\Models\CurrencyRate;
+use App\Models\ReportRequest;
 use Carbon\Carbon;
 use Carbon\CarbonImmutable;
 use Illuminate\Http\Client\RequestException;
@@ -36,6 +37,19 @@ class CurrencyLayerService
             ->when(!empty($currencies), function (Collection $collection) use ($currencies) {
                 return $collection->filter(fn (float $value, string $key) => in_array($key, $currencies));
             })->toArray();
+    }
+
+    /**
+     * @throws RequestException
+     */
+    public function getReportData(ReportRequest $request) : array
+    {
+        return $this->getHistoricalRateForTimeFrame(
+            $request->start_date,
+            $request->end_date,
+            $request->currency,
+            $request->interval
+        );
     }
 
     /**

@@ -22,27 +22,19 @@ class ProcessReportsRequestsJob implements ShouldQueue
         ReportRequest::query()
             ->where('status', StatusEnum::Pending)
             ->each(function (ReportRequest $request) use ($service) {
+                $request->status = StatusEnum::Processing;
+                $request->save();
                 try {
-                    $request->status = StatusEnum::Processing;
-                    $request->save();
-
-                    $data = $service->getHistoricalRateForTimeFrame(
-                        $request->start_date,
-                        $request->end_date,
-                        $request->currency,
-                        $request->interval
-                    );
-
+                    $data = $service->getReportData($request);
                     $this->writeDataToCsv($data, "report_{$request->id}.csv");
 
                     $request->status = StatusEnum::Completed;
-                    $request->save();
                 } catch (\Exception $e) {
-                    $request->status = StatusEnum::Failed;
-                    $request->save();
-
                     Log::error("Failed to process report request {$request->id}: {$e->getMessage()}");
+
+                    $request->status = StatusEnum::Failed;
                 }
+                $request->save();
             });
     }
 

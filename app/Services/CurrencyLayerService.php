@@ -104,7 +104,7 @@ class CurrencyLayerService
                 $responseCurrency = substr($currencyPair, -3);
 
                 CurrencyRate::query()->firstOrCreate([
-                    'date' => $date,
+                    'date' => Carbon::parse($date),
                     'source_currency' => substr($currencyPair, 0, 3),
                     'currency' => $responseCurrency,
                 ], [

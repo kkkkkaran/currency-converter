@@ -53,8 +53,8 @@ class CurrencyLayerService
 
         $availableRates = CurrencyRate::query()
             ->whereBetween('date', [$startDate, $endDate])
-            ->where('source_currency', $sourceCurrency)
-            ->where('currency', $currency)
+            ->whereSourceCurrency($sourceCurrency)
+            ->whereCurrency($currency)
             ->get();
 
         for ($date = $startDate; $date->lte($endDate); $date = $this->incrementDateForInterval($date, $interval)) {
@@ -104,7 +104,7 @@ class CurrencyLayerService
                 $responseCurrency = substr($currencyPair, -3);
 
                 CurrencyRate::query()->firstOrCreate([
-                    'date' => Carbon::parse($date),
+                    'date' => $date,
                     'source_currency' => substr($currencyPair, 0, 3),
                     'currency' => $responseCurrency,
                 ], [

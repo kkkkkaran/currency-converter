@@ -4,8 +4,8 @@ namespace App\Clients;
 
 use Carbon\CarbonImmutable;
 use Illuminate\Http\Client\RequestException;
+use Illuminate\Http\Client\Response;
 use Illuminate\Support\Facades\Http;
-use InvalidArgumentException;
 
 class CurrencyLayerClient
 {
@@ -16,14 +16,6 @@ class CurrencyLayerClient
     {
         $this->apiKey = config('currencylayer.api_key');
         $this->baseUrl = config('currencylayer.base_url');
-
-        if (empty($this->apiKey)) {
-            throw new InvalidArgumentException("CurrencyLayer API key is not set.");
-        }
-
-        if (empty($this->baseUrl)) {
-            throw new InvalidArgumentException("CurrencyLayer base URL is not set.");
-        }
     }
 
     /**
@@ -31,9 +23,7 @@ class CurrencyLayerClient
      */
     public function fetchLiveRates(array $currencies = [], string $source = 'USD'): array
     {
-        $endpoint = 'live';
         $query = [
-            'access_key' => $this->apiKey,
             'source' => $source,
         ];
 
@@ -41,10 +31,7 @@ class CurrencyLayerClient
             $query['currencies'] = implode(',', $currencies);
         }
 
-        $response = Http::get($this->baseUrl . $endpoint, $query);
-        $response->throwIf($response->failed());
-
-        return $response->json()['quotes'];
+        return $this->makeRequest('live', $query)->json('quotes');
     }
 
     /**
@@ -53,13 +40,11 @@ class CurrencyLayerClient
     public function fetchHistoricalRatesForTimeFrame(
         CarbonImmutable $startDate,
         CarbonImmutable $endDate,
-        array $currencies = [],
-        string $source = 'USD'
+        array           $currencies = [],
+        string          $source = 'USD'
     ): array
     {
-        $endpoint = 'timeframe';
         $query = [
-            'access_key' => $this->apiKey,
             'start_date' => $startDate->toDateString(),
             'end_date' => $endDate->toDateString(),
             'source' => $source,
@@ -69,11 +54,7 @@ class CurrencyLayerClient
             $query['currencies'] = implode(',', $currencies);
         }
 
-        $response = Http::get($this->baseUrl . $endpoint, $query);
-
-        $response->throwIf($response->failed());
-
-        return $response->json()['quotes'];
+        return $this->makeRequest('timeframe', $query)->json('quotes');
     }
 
     /**
@@ -81,10 +62,14 @@ class CurrencyLayerClient
      */
     public function fetchSupportedCurrencies(): array
     {
-        $endpoint = 'list';
-        $response = Http::get($this->baseUrl . $endpoint, ['access_key' => $this->apiKey]);
-        $response->throwIf($response->failed());
+        return $this->makeRequest('list')->json('currencies');
+    }
 
-        return $response->json()['currencies'];
+    /**
+     * @throws RequestException
+     */
+    private function makeRequest(string $endpoint, array $query = []): Response
+    {
+        return Http::get($this->baseUrl . $endpoint, array_merge(['access_key' => $this->apiKey], $query))->throw();
     }
 }
